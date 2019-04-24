@@ -71,6 +71,7 @@ public class DragRecycleView extends GridView {
         this.context = context;
         detector = new GestureDetector(context, new MyGestureListener());
         paint = new Paint();
+        paint.setAlpha(150);
         setOnItemDropListener((OnItemDropListener) getAdapter());
 //        paint.setAntiAlias(true);
 //        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.ADD));
