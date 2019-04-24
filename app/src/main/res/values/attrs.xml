@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="DragRecycleView">
+        <attr name="columns" format="integer"></attr>
+        <attr name="columnw" format="dimension"></attr>
+        <attr name="hrspace" format="dimension"></attr>
+        <attr name="vrspace" format="dimension"></attr>
+    </declare-styleable>
+</resources>
