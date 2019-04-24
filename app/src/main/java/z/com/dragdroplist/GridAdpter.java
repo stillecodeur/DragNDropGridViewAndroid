@@ -15,13 +15,34 @@ import org.askerov.dynamicgrid.BaseDynamicGridAdapter;
 
 import java.util.List;
 
-public class GridAdpter extends BaseDynamicGridAdapter {
+public class GridAdpter extends BaseDynamicGridAdapter implements OnItemDropListener {
 
     private Context context;
     private List<SwatchBean> nums;
     private LayoutInflater layoutInflater;
     private int mItemHeight = 0, mItemWidth = 0;
     private OnItemInflateListener onItemInflateListener;
+
+    @Override
+    public void onDropAtIndex(int pickedIndex, int droppedIndex) {
+
+        SwatchBean oldItem = getItem(pickedIndex);
+        SwatchBean newItem = getItem(droppedIndex);
+
+        nums.set(droppedIndex, oldItem);
+        nums.set(pickedIndex, newItem);
+
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public void onDropOutside(int pickedIndex) {
+
+        SwatchBean droppedItem = getItem(pickedIndex);
+        droppedItem.setColor(0);
+        droppedItem.setName(null);
+        notifyDataSetChanged();
+    }
 
     public interface OnItemInflateListener {
         void onInflate(int h, int w);
@@ -37,6 +58,7 @@ public class GridAdpter extends BaseDynamicGridAdapter {
         this.context = context;
         this.nums = items;
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
     }
 
 
@@ -83,6 +105,9 @@ public class GridAdpter extends BaseDynamicGridAdapter {
 
             }
 
+        } else {
+            viewHolder.colorLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.swatch_icon));
+            viewHolder.tvZcc.setText("");
         }
 
 

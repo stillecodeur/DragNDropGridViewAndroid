@@ -39,15 +39,12 @@ public class DragRecycleView extends GridView {
     private float x1, y1, x2, y2;
     private int rowNum = 3, columnNum = 8;
     private boolean longPressed = false;
-    private OnItemSwapListener onItemSwapListener;
+    private OnItemDropListener onItemDropListener;
 
-    public void setOnItemSwapListener(OnItemSwapListener onItemSwapListener) {
-        this.onItemSwapListener = onItemSwapListener;
+    public void setOnItemDropListener(OnItemDropListener onItemDropListener) {
+        this.onItemDropListener = onItemDropListener;
     }
 
-    public interface OnItemSwapListener {
-        void onSwapped(int pickedIndex, int droppedIndex);
-    }
 
     public DragRecycleView(@NonNull Context context) {
         super(context);
@@ -74,6 +71,7 @@ public class DragRecycleView extends GridView {
         this.context = context;
         detector = new GestureDetector(context, new MyGestureListener());
         paint = new Paint();
+        setOnItemDropListener((OnItemDropListener) getAdapter());
 //        paint.setAntiAlias(true);
 //        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.ADD));
 //        paint.setAlpha(0xFF);
@@ -107,15 +105,21 @@ public class DragRecycleView extends GridView {
                 canvas.drawBitmap(mItemBitmap, x2 - 150, y2 - 150, paint);
                 break;
             case DROP:
+
                 mDroppedIndex = getIndexFromLocation(x2, y2);
+                if (mDroppedIndex == -1) {
+                    onItemDropListener.onDropOutside(mPickedIndex);
+                    mListMode = ListMode.NOTHING;
+                    return;
+                }
+
                 View droppedView = getChildAt(mPickedIndex);
                 mListMode = ListMode.NOTHING;
                 canvas.drawBitmap(mItemBitmap, droppedView.getLeft(), droppedView.getTop(), paint);
                 mItemBitmap.recycle();
                 mItemBitmap = null;
-                if (onItemSwapListener != null) {
-                    onItemSwapListener.onSwapped(mPickedIndex, mDroppedIndex);
-                }
+                onItemDropListener.onDropAtIndex(mPickedIndex, mDroppedIndex);
+
                 break;
 
 
@@ -158,11 +162,15 @@ public class DragRecycleView extends GridView {
 
 
     private int getIndexFromLocation(float x, float y) {
+
+
+        if (x < 0 || y < 0) return -1;
+
         int itemX = (int) Math.ceil(x / mItemWidth);
         int itemY = (int) Math.ceil(y / mItemHeight);
 
-        if (itemY > rowNum) itemY = rowNum;
-        if (itemX > columnNum) itemX = columnNum;
+        if (itemY > rowNum) return -1;
+        if (itemX > columnNum) return -1;
         int pos = ((itemY - 1) * columnNum) + (itemX - 1);
 //        if (pos < 0) pos = 0;
 //        else if (pos == 0) pos = 1;
@@ -179,11 +187,16 @@ public class DragRecycleView extends GridView {
                 x1 = ev.getX();
                 y1 = ev.getY();
                 mPickedIndex = getIndexFromLocation(x1, y1);
+
+                if (mPickedIndex == -1) return false;
+
                 mListMode = ListMode.PICK;
                 SwatchBean swatchBean = (SwatchBean) getAdapter().getItem(mPickedIndex);
-                if (TextUtils.isEmpty(swatchBean.getName())) {
+                if (TextUtils.isEmpty(swatchBean.getName())){
+                    mListMode = ListMode.NOTHING;
                     return false;
                 }
+
                 View view = getChildAt(mPickedIndex);
                 mItemBitmap = loadBitmapFromView(view);
                 break;

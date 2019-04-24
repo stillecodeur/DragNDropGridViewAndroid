@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements OnStartDragListen
 
         list.add(new SwatchBean(Color.RED, "Red"));
         list.add(new SwatchBean(Color.BLUE, "Blue"));
-        int i = 1;
+        int i = 0;
         while (i != 22) {
             list.add(new SwatchBean());
             i++;
@@ -144,20 +144,7 @@ public class MainActivity extends AppCompatActivity implements OnStartDragListen
         });
 
 
-        dragRecycleView.setOnItemSwapListener(new DragRecycleView.OnItemSwapListener() {
-            @Override
-            public void onSwapped(int pickedIndex, int droppedIndex) {
-
-                SwatchBean oldItem = gridAdpter.getItem(pickedIndex);
-                SwatchBean newItem = gridAdpter.getItem(droppedIndex);
-
-                gridAdpter.setItem(droppedIndex, oldItem);
-                gridAdpter.setItem(pickedIndex, newItem);
-
-
-                gridAdpter.notifyDataSetChanged();
-            }
-        });
+        dragRecycleView.setOnItemDropListener(gridAdpter);
 
 
     }
