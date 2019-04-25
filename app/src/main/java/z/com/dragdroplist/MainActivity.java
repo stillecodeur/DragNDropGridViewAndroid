@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.ListView;
 
 import org.askerov.dynamicgrid.DynamicGridView;
 
@@ -35,6 +36,9 @@ public class MainActivity extends AppCompatActivity implements OnStartDragListen
     private ItemTouchHelper mItemTouchHelper;
     private DragRecycleView dragRecycleView;
     private int[][] itemMatrix;
+    private ListDragView listDragView;
+    private SwatchAdapter swatchAdapter;
+    private List<SwatchBean> swatchBeans;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements OnStartDragListen
 
         context = MainActivity.this;
         dragRecycleView = findViewById(R.id.dragView);
+        listDragView = findViewById(R.id.listDragView);
 
         list = new ArrayList<>();
         itemMatrix = new int[5][4];
@@ -57,8 +62,19 @@ public class MainActivity extends AppCompatActivity implements OnStartDragListen
             i++;
         }
 
+
+        swatchBeans = new ArrayList<>();
+
+        for (int j = 0; j < 24; j++) {
+            swatchBeans.add(new SwatchBean(Color.YELLOW, "Yellow"));
+        }
+
+        swatchAdapter = new SwatchAdapter(context, swatchBeans);
+        listDragView.setAdapter(swatchAdapter);
+
         final GridAdpter gridAdpter = new GridAdpter(context, list, 4);
         dragRecycleView.setAdapter(gridAdpter);
+        listDragView.setDragRecycleView(dragRecycleView);
 //        GridLayoutManager gridLayoutManager=new GridLayoutManager(context,4);
 //
 //        recyclerView.setLayoutManager(gridLayoutManager);

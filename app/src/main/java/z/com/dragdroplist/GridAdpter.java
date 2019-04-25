@@ -44,6 +44,14 @@ public class GridAdpter extends BaseDynamicGridAdapter implements OnItemDropList
         notifyDataSetChanged();
     }
 
+    @Override
+    public void onDragDropFromOutside(SwatchBean swatchBean, int droppedIndex) {
+        long id=getItemId(droppedIndex);
+        nums.set(droppedIndex, swatchBean);
+        set(nums);
+        notifyDataSetChanged();
+    }
+
     public interface OnItemInflateListener {
         void onInflate(int h, int w);
     }

@@ -21,6 +21,7 @@ import android.view.ViewConfiguration;
 import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.TextView;
 
 public class DragRecycleView extends GridView {
 
@@ -29,17 +30,43 @@ public class DragRecycleView extends GridView {
         NOTHING, DRAG, DROP, PICK
     }
 
+    enum DragSource {
+        INNER_DRAG, OUTER_DRAG
+    }
+
     private static final String TAG = DragRecycleView.class.getSimpleName();
     private Context context;
     private GestureDetector detector;
     private int selectedPosition = -1, mItemHeight = 0, mItemWidth = 0, mPickedIndex = -1, mDroppedIndex = -1;
     private Paint paint;
     private ListMode mListMode = ListMode.NOTHING;
+    private DragSource mDragSource = DragSource.INNER_DRAG;
     private Bitmap mItemBitmap;
     private float x1, y1, x2, y2;
     private int rowNum = 3, columnNum = 8;
     private boolean longPressed = false;
     private OnItemDropListener onItemDropListener;
+    private SwatchBean mSwatchBean;
+    private int swapViewWidth = 0, swapViewHeight = 0;
+    private View mSwatchView, mSwatchLayout;
+    private TextView mSwatchTextView;
+
+    public void setMovableItem(Bitmap bitmap, SwatchBean swatchBean, MotionEvent event, int w, int h) {
+        mItemBitmap =Bitmap.createBitmap(bitmap);
+        mSwatchBean = swatchBean;
+        swapViewWidth = w;
+        swapViewHeight = h;
+//        mSwatchView=getChildAt(1);
+//        mSwatchTextView.setText(swatchBean.getName());
+//        mSwatchLayout.setBackgroundColor(swatchBean.getColor());
+//        mItemBitmap = loadBitmapFromView(mSwatchView);
+        mDragSource = DragSource.OUTER_DRAG;
+        onTouchEvent(event);
+    }
+
+    public void setActionDrop(MotionEvent motionEvent) {
+        onTouchEvent(motionEvent);
+    }
 
     public void setOnItemDropListener(OnItemDropListener onItemDropListener) {
         this.onItemDropListener = onItemDropListener;
@@ -72,6 +99,11 @@ public class DragRecycleView extends GridView {
         detector = new GestureDetector(context, new MyGestureListener());
         paint = new Paint();
         paint.setAlpha(150);
+
+        mSwatchView = inflate(context, R.layout.grid_row, null);
+        mSwatchTextView = mSwatchView.findViewById(R.id.tv_zcc_text);
+        mSwatchLayout = mSwatchView.findViewById(R.id.color_layout);
+
         setOnItemDropListener((OnItemDropListener) getAdapter());
 //        paint.setAntiAlias(true);
 //        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.ADD));
@@ -104,6 +136,7 @@ public class DragRecycleView extends GridView {
                 break;
             case DRAG:
                 canvas.drawBitmap(mItemBitmap, x2 - 150, y2 - 150, paint);
+//                canvas.drawBitmap(mItemBitmap, x2, y2, paint);
                 break;
             case DROP:
 
@@ -114,18 +147,33 @@ public class DragRecycleView extends GridView {
                     return;
                 }
 
-                View droppedView = getChildAt(mPickedIndex);
-                mListMode = ListMode.NOTHING;
-                canvas.drawBitmap(mItemBitmap, droppedView.getLeft(), droppedView.getTop(), paint);
-                mItemBitmap.recycle();
-                mItemBitmap = null;
-                onItemDropListener.onDropAtIndex(mPickedIndex, mDroppedIndex);
+                View droppedView = null;
+                switch (mDragSource) {
+                    case INNER_DRAG:
+                        droppedView = getChildAt(mPickedIndex);
+                        resetGrid(canvas, droppedView);
+                        onItemDropListener.onDropAtIndex(mPickedIndex, mDroppedIndex);
+                        break;
+                    case OUTER_DRAG:
+                        droppedView = getChildAt(mDroppedIndex);
+                        resetGrid(canvas, droppedView);
+                        onItemDropListener.onDragDropFromOutside(mSwatchBean, mDroppedIndex);
+                        break;
+                }
+
 
                 break;
 
 
         }
 
+    }
+
+    private void resetGrid(Canvas canvas, View view) {
+        mListMode = ListMode.NOTHING;
+        canvas.drawBitmap(mItemBitmap, view.getLeft(), view.getTop(), paint);
+        mItemBitmap.recycle();
+        mItemBitmap = null;
     }
 
     @Override
@@ -185,6 +233,7 @@ public class DragRecycleView extends GridView {
 
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                mDragSource = DragSource.INNER_DRAG;
                 x1 = ev.getX();
                 y1 = ev.getY();
                 mPickedIndex = getIndexFromLocation(x1, y1);
@@ -193,7 +242,7 @@ public class DragRecycleView extends GridView {
 
                 mListMode = ListMode.PICK;
                 SwatchBean swatchBean = (SwatchBean) getAdapter().getItem(mPickedIndex);
-                if (TextUtils.isEmpty(swatchBean.getName())){
+                if (TextUtils.isEmpty(swatchBean.getName())) {
                     mListMode = ListMode.NOTHING;
                     return false;
                 }
@@ -203,15 +252,29 @@ public class DragRecycleView extends GridView {
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (longPressed) return false;
-                mListMode = ListMode.DRAG;
+
                 x2 = ev.getX();
                 y2 = ev.getY();
-                handler.removeCallbacks(mLongPressed);
+
+                mListMode = ListMode.DRAG;
+                if (mDragSource == DragSource.OUTER_DRAG) {
+                    x2 = ev.getX() - swapViewWidth;
+                    y2 = ev.getY();
+                }
+                Log.d(TAG, "onTouchEvent: X--" + x2 + "--Y--" + y2);
+//                handler.removeCallbacks(mLongPressed);
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
+
+
                 x2 = ev.getX();
                 y2 = ev.getY();
+
+                if (mDragSource == DragSource.OUTER_DRAG) {
+                    x2 = ev.getX() - swapViewWidth;
+                    y2 = ev.getY();
+                }
                 mListMode = ListMode.DROP;
                 handler.removeCallbacks(mLongPressed);
                 invalidate();
