@@ -36,6 +36,16 @@
 
     </z.com.dragdroplist.ListDragView>
 
+    <GridView
+        android:id="@+id/gridView"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="5"
+        android:numColumns="2"
+        android:visibility="gone"
+        >
+
+    </GridView>
 
     <z.com.dragdroplist.DragRecycleView
         android:id="@+id/dragView"

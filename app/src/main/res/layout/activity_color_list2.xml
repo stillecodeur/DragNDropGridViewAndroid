@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ColorListActivity">
+
+
+
+    <z.com.dragdroplist.ZccLibraryView
+        android:id="@+id/zcc_grid_view"
+        android:layout_width="300dp"
+        app:numColumn="2"
+        android:layout_height="match_parent"
+        >
+    </z.com.dragdroplist.ZccLibraryView>
+
+    <z.com.dragdroplist.DragRecycleView
+        android:id="@+id/dragView"
+        android:layout_toRightOf="@id/zcc_grid_view"
+        android:layout_width="600dp"
+        android:layout_height="match_parent"
+        app:columns="8"
+        app:hrspace="5dp"
+        app:vrspace="5dp"></z.com.dragdroplist.DragRecycleView>
+
+
+
+</RelativeLayout>

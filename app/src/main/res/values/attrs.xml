@@ -7,4 +7,12 @@
         <attr name="hrspace" format="dimension"></attr>
         <attr name="vrspace" format="dimension"></attr>
     </declare-styleable>
+
+    <declare-styleable name="ZccLibraryView">
+        <attr name="numColumn" format="integer"></attr>
+        <attr name="columnWidth" format="dimension"></attr>
+        <attr name="hr_space" format="dimension"></attr>
+        <attr name="vr_space" format="dimension"></attr>
+        <attr name="row_height" format="dimension"></attr>
+    </declare-styleable>
 </resources>

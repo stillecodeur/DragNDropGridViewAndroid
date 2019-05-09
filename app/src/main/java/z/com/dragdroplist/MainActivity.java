@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements OnStartDragListen
     private ListDragView listDragView;
     private SwatchAdapter swatchAdapter;
     private List<SwatchBean> swatchBeans;
+    private GridView mGridView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements OnStartDragListen
         context = MainActivity.this;
         dragRecycleView = findViewById(R.id.dragView);
         listDragView = findViewById(R.id.listDragView);
+        mGridView=findViewById(R.id.gridView);
 
         list = new ArrayList<>();
         itemMatrix = new int[5][4];
@@ -74,7 +76,12 @@ public class MainActivity extends AppCompatActivity implements OnStartDragListen
 
         final GridAdpter gridAdpter = new GridAdpter(context, list, 4);
         dragRecycleView.setAdapter(gridAdpter);
-        listDragView.setDragRecycleView(dragRecycleView);
+        listDragView.setSwatchCatchListener(dragRecycleView);
+
+
+        mGridView.setAdapter(gridAdpter);
+//        mGridView.setVerticalScrollBarEnabled(true);
+
 //        GridLayoutManager gridLayoutManager=new GridLayoutManager(context,4);
 //
 //        recyclerView.setLayoutManager(gridLayoutManager);

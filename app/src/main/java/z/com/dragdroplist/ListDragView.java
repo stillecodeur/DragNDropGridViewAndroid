@@ -15,12 +15,13 @@ import android.widget.RelativeLayout;
 public class ListDragView extends ListView {
 
 
-    private static final String TAG=ListDragView.class.getSimpleName();
+    private static final String TAG = ListDragView.class.getSimpleName();
     private DragRecycleView dragRecycleView;
     private Bitmap mBitmap;
     private SwatchBean mSwatchBean;
     private View mView;
     private Paint paint;
+    private SwatchCatchListener swatchCatchListener;
 
     public ListDragView(Context context) {
         super(context);
@@ -51,13 +52,16 @@ public class ListDragView extends ListView {
     @Override
     public void onDrawForeground(Canvas canvas) {
 
-        if(mView!=null) {
+        if (mView != null) {
             canvas.drawBitmap(mBitmap, mView.getRight() - 150, mView.getTop() - 150, paint);
         }
 
 
     }
 
+    public void setSwatchCatchListener(SwatchCatchListener swatchCatchListener) {
+        this.swatchCatchListener = swatchCatchListener;
+    }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -67,24 +71,25 @@ public class ListDragView extends ListView {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                int pos=4;
+                int pos = 4;
                 mView = getChildAt(pos);
                 mSwatchBean = (SwatchBean) getAdapter().getItem(pos);
-                mBitmap=loadBitmapFromView(mView);
+                mBitmap = loadBitmapFromView(mView);
+                swatchCatchListener.onCatchSwatch(mBitmap, mSwatchBean, getWidth(), getHeight());
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (actionX > getWidth()) {
-                    Log.d(TAG, "onTouchEvent: X--"+event.getX()+"--Y--"+event.getY());
-                    dragRecycleView.setMovableItem(mBitmap,mSwatchBean, event,getWidth(),getHeight());
+                    Log.d(TAG, "onTouchEvent: X--" + event.getX() + "--Y--" + event.getY());
+                    swatchCatchListener.onDragSwatch(event);
                 }
                 break;
             case MotionEvent.ACTION_CANCEL:
                 event.setAction(MotionEvent.ACTION_UP);
-                dragRecycleView.setActionDrop(event);
+                swatchCatchListener.onDropSwatch(event);
                 break;
             case MotionEvent.ACTION_UP:
                 event.setAction(MotionEvent.ACTION_UP);
-                dragRecycleView.setActionDrop(event);
+                swatchCatchListener.onDropSwatch(event);
                 break;
         }
 

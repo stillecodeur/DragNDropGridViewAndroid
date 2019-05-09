@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <z.com.dragdroplist.ZccGridView
+        android:id="@+id/grid_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:divider="@android:color/white"
+        android:dividerHeight="1dp"
+        android:layout_marginLeft="50dp"
+        android:scrollbars="none">
+
+    </z.com.dragdroplist.ZccGridView>
+
+
+
+
+    <RelativeLayout
+        android:layout_width="55dp"
+        android:layout_height="match_parent"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:gravity="center">
+
+
+        <View
+            android:id="@+id/track"
+            android:layout_width="45dp"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/hue_track" />
+
+        <View
+            android:id="@+id/slider"
+            android:layout_width="55dp"
+            android:layout_height="35dp"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/slider" />
+
+
+    </RelativeLayout>
+
+</RelativeLayout>
